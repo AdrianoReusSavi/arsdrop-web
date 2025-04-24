@@ -1,15 +1,15 @@
-import { Typography, Spin } from 'antd';
+import { Typography } from 'antd';
 import CustomQrCode from '../ui/CustomQrCode';
 
 const { Paragraph } = Typography;
 
 export default function QrCodePanel({ loading, error, qrCodeUrl, isMobile }: any) {
-    if (loading) {
-        return <Spin size="large" tip="Carregando QR Code..." />;
-    }
+    let status: 'loading' | 'expired' | 'active' | 'scanned' = 'active';
 
-    if (error) {
-        return <Paragraph type="danger" style={{ color: '#ff4d4f' }}>{error}</Paragraph>;
+    if (loading) {
+        status = 'loading';
+    } else if (error) {
+        status = 'expired';
     }
 
     if (qrCodeUrl) {
@@ -17,8 +17,7 @@ export default function QrCodePanel({ loading, error, qrCodeUrl, isMobile }: any
             <CustomQrCode
                 size={isMobile ? 250 : 400}
                 value={qrCodeUrl}
-                icon="@"
-                bordered
+                status={status}
             />
         );
     }

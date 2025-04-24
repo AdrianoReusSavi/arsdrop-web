@@ -1,6 +1,6 @@
 import { List, Progress, Typography, Empty } from 'antd';
 
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 
 interface FileTransferPanelProps {
   files: Array<{
@@ -20,9 +20,12 @@ export default function FileTransferPanel({
 }: FileTransferPanelProps) {
   return (
     <div style={{ width: '100%' }}>
-      <Title level={4} style={{ color: textColor, marginBottom: 16 }}>
+      <Title style={{ color: textColor, marginBottom: 16 }}>
         Recebimento de arquivos
       </Title>
+      <Paragraph style={{ color: textColor }}>
+        Escaneie o código QR para conectar seu dispositivo
+      </Paragraph>
       <div
         className="custom-scrollbar"
         style={{

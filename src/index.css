@@ -72,30 +72,6 @@ button:focus-visible {
   }
 }
 
-/* .ant-upload-list {
-  max-height: 120px;
-  overflow-y: auto;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-  padding: 8px;
-  background-color: #fafafa;
-  margin-top: 12px;
-}
-
-.ant-upload-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.ant-upload-list::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-}
-
-.ant-upload-list::-webkit-scrollbar-track {
-  background-color: transparent;
-} */
-
-/* panelbar */
 .panel-container {
   display: flex;
   height: 100%;
@@ -164,12 +140,9 @@ button:focus-visible {
   box-shadow: none !important;
 }
 
-/* No seu CSS global ou module */
 .custom-scrollbar {
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: rgba(100, 100, 100, 0.4) transparent; /* Firefox */
-
-  /* WebKit (Chrome, Edge, Safari) */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 100, 100, 0.4) transparent;
 }
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;

@@ -24,7 +24,9 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
             }}
         >
             <CustomHeader />
-            <Content>{children}</Content>
+            <Content style={{ height: 'calc(100vh - 64px)' }}>
+                {children}
+            </Content>
         </Layout>
     );
 };
