@@ -1,7 +1,4 @@
-import { Typography } from 'antd';
 import CustomQrCode from '../ui/CustomQrCode';
-
-const { Paragraph } = Typography;
 
 export default function QrCodePanel({ loading, error, qrCodeUrl, isMobile }: any) {
     let status: 'loading' | 'expired' | 'active' | 'scanned' = 'active';
