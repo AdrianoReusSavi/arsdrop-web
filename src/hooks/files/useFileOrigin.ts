@@ -9,7 +9,7 @@ export default function useFileOrigin() {
 
     try {
       for (const file of files) {
-        const chunkSize = 256 * 1024;
+        const chunkSize = 128 * 1024;
         const metadata = JSON.stringify({ name: file.name, type: file.type, size: file.size });
         dataChannel.send(`META:${metadata}`);
 
@@ -23,7 +23,6 @@ export default function useFileOrigin() {
           await new Promise(res => setTimeout(res, 5));
         }
       }
-      dataChannel.close();
     } catch {}
     setSending(false);
   };

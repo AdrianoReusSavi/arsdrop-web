@@ -13,7 +13,7 @@ export default function useOriginConnection(token: string | null) {
 
     const setupConnection = async () => {
       setLoading(true);
-      
+
       try {
         const connection = new signalR.HubConnectionBuilder()
           .withUrl(signalrUrl)
@@ -27,7 +27,10 @@ export default function useOriginConnection(token: string | null) {
         connection.on('ReceiverReady', async () => {
           const channel = peer.createDataChannel('data');
           setDataChannel(channel);
+
           channel.onopen = () => setConnected(true);
+          channel.onclose = () => setConnected(false);
+          channel.onerror = () => setConnected(false);
 
           const offer = await peer.createOffer();
           await peer.setLocalDescription(offer);
@@ -37,6 +40,13 @@ export default function useOriginConnection(token: string | null) {
         peer.onicecandidate = (event) => {
           if (event.candidate) {
             connection.invoke('ExchangeIceCandidateAsync', token, JSON.stringify(event.candidate));
+          }
+        };
+
+        peer.onconnectionstatechange = () => {
+          const state = peer.connectionState;
+          if (state === 'disconnected' || state === 'failed' || state === 'closed') {
+            setConnected(false);
           }
         };
 

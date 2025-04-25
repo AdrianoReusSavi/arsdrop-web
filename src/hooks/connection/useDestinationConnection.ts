@@ -49,12 +49,22 @@ export default function useDestinationConnection(token: string | null, role: Con
         peer.ondatachannel = (event) => {
           const channel = event.channel;
           setDataChannel(channel);
+
           channel.onopen = () => setConnected(true);
+          channel.onclose = () => setConnected(false);
+          channel.onerror = () => setConnected(false);
         };
 
         peer.onicecandidate = (event) => {
           if (event.candidate) {
             connection.invoke('ExchangeIceCandidateAsync', token, JSON.stringify(event.candidate));
+          }
+        };
+
+        peer.onconnectionstatechange = () => {
+          const state = peer.connectionState;
+          if (state === 'disconnected' || state === 'failed' || state === 'closed') {
+            setConnected(false);
           }
         };
 
