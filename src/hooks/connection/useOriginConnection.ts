@@ -20,10 +20,17 @@ export default function useOriginConnection(token: string | null) {
           .withAutomaticReconnect()
           .build();
 
-        const peer = new RTCPeerConnection({
-          iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
-        });
-
+          const peer = new RTCPeerConnection({
+            iceServers: [
+              { urls: 'stun:stun.l.google.com:19302' },
+              {
+                urls: 'turn:openrelay.metered.ca:80',
+                username: 'openrelayproject',
+                credential: 'openrelayproject'
+              }
+            ]
+          });
+          
         connection.on('ReceiverReady', async () => {
           const channel = peer.createDataChannel('data');
           setDataChannel(channel);
