@@ -45,7 +45,6 @@ export default function useFileDestination(dataChannel: RTCDataChannel | null) {
         chunks.push(event.data);
 
         file.received += size;
-
         fileRefs.current.set(name, file);
 
         setFiles(prev =>
@@ -73,6 +72,9 @@ export default function useFileDestination(dataChannel: RTCDataChannel | null) {
             prev.map(f => (f.name === name ? { ...file } : f))
           );
         }
+
+        const chunkIndex = chunks.length - 1;
+        dataChannel.send(`ACK:${file.name}:${chunkIndex}`);
       }
     };
 

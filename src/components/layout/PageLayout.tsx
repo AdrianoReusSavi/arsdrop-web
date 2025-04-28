@@ -1,17 +1,14 @@
 import React from 'react';
 import { Layout } from 'antd';
-import CustomHeader from './CustomHeader';
-import { useTheme } from '../../contexts/ThemeContext';
 
 const { Content } = Layout;
 
 interface PageLayoutProps {
     children: React.ReactNode;
+    darkMode: boolean;
 }
 
-const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
-    const { darkMode } = useTheme();
-
+const PageLayout: React.FC<PageLayoutProps> = ({ children, darkMode }) => {
     const textColor = darkMode ? '#f0f0f0' : '#000000';
 
     return (
@@ -23,8 +20,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
                 color: textColor,
             }}
         >
-            <CustomHeader />
-            <Content style={{ height: 'calc(100vh - 64px)' }}>
+            <Content style={{ height: '100vh' }}>
                 {children}
             </Content>
         </Layout>

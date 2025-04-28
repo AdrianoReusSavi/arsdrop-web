@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
+import { useConnection } from '../../contexts/ConnectionContext';
 
 interface QrCodeResponse {
     token: string;
 }
 
-export default function useSendQrCode() {
+export default function useQrCode() {
+    const { setToken, isOrigin, ready } = useConnection();
     const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
-    const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -14,9 +15,16 @@ export default function useSendQrCode() {
     const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
     useEffect(() => {
+        if (!ready) return;
+
+        if (!isOrigin) {
+            setLoading(false);
+            return;
+        }
+
         const fetchQrCodeUrl = async () => {
             try {
-                const response = await fetch(`${apiBaseUrl}/Send/create`, {
+                const response = await fetch(`${apiBaseUrl}/Connect/create`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({}),
@@ -28,9 +36,8 @@ export default function useSendQrCode() {
 
                 const data: QrCodeResponse = await response.json();
                 const encodedToken = btoa(data.token);
-                setQrCodeUrl(`${frontendUrl}/sendDestination?token=${encodedToken}`);
+                setQrCodeUrl(`${frontendUrl}/?token=${encodedToken}`);
                 setToken(data.token);
-
             } catch (err: any) {
                 setError(err.message || 'Erro desconhecido');
             } finally {
@@ -39,7 +46,7 @@ export default function useSendQrCode() {
         };
 
         fetchQrCodeUrl();
-    }, []);
+    }, [ready, isOrigin]);
 
-    return { qrCodeUrl, token, loading, error };
+    return { qrCodeUrl, loading, error };
 }

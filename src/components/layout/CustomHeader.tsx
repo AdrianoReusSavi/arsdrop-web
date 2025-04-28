@@ -4,7 +4,11 @@ import { useTheme } from '../../contexts/ThemeContext';
 
 const { Header } = Layout;
 
-export default function CustomHeader() {
+type CustomHeaderProps = {
+  disabled: boolean;
+};
+
+export default function CustomHeader({ disabled }: CustomHeaderProps) {
   const { darkMode, toggleDarkMode } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,9 +27,9 @@ export default function CustomHeader() {
           onClick={handleMenuClick}
           style={styles.menu}
         >
-          <Menu.Item key="/">Home</Menu.Item>
-          <Menu.Item key="/sendOrigin">Enviar</Menu.Item>
-          <Menu.Item key="/receiveOrigin">Receber</Menu.Item>
+          <Menu.Item disabled={disabled} key="/">Home</Menu.Item>
+          <Menu.Item disabled={disabled} key="/sendOrigin">Enviar</Menu.Item>
+          <Menu.Item disabled={disabled} key="/receiveOrigin">Receber</Menu.Item>
         </Menu>
 
         <Switch
