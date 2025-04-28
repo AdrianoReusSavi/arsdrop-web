@@ -18,6 +18,7 @@ interface CustomUploadProps {
 const CustomUpload: React.FC<CustomUploadProps> = ({ connected, dataChannel, textColor, borderColor, disabledButtonStyle }) => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const { sendFiles, sending } = useFileOrigin();
+  const isDisabled = fileList.length === 0 || !connected || sending;
 
   const handleUpload = async () => {
     if (!dataChannel || !connected) {
@@ -90,9 +91,9 @@ const CustomUpload: React.FC<CustomUploadProps> = ({ connected, dataChannel, tex
           <Button
             type="primary"
             onClick={handleButtonClick}
-            disabled={fileList.length === 0 || !connected || sending}
+            disabled={isDisabled}
             loading={sending}
-            style={disabledButtonStyle}
+            style={isDisabled ? disabledButtonStyle : { }}
           >
             {sending ? 'Enviando...' : 'Enviar'}
           </Button>
