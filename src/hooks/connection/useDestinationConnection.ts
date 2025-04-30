@@ -14,14 +14,14 @@ export default function useDestinationConnection(token: string | null) {
 
     let connection: signalR.HubConnection;
     let peer: RTCPeerConnection;
+    const iceQueue: RTCIceCandidateInit[] = [];
+    let remoteDescSet = false;
 
     const setupConnection = async () => {
       setLoading(true);
 
       try {
-        let url = `${apiBaseUrl}/Connect/validate`;
-
-        const response = await fetch(url, {
+        const response = await fetch(`${apiBaseUrl}/Connect/validate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Token': token },
         });
@@ -41,9 +41,8 @@ export default function useDestinationConnection(token: string | null) {
 
         peer = new RTCPeerConnection({
           iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
             {
-              urls: 'turn:openrelay.metered.ca:80',
+              urls: 'turn:openrelay.metered.ca:443?transport=tcp',
               username: 'openrelayproject',
               credential: 'openrelayproject'
             }
@@ -82,16 +81,25 @@ export default function useDestinationConnection(token: string | null) {
         connection.on('ReceiveOffer', async (offerJson: string) => {
           const offer = JSON.parse(offerJson);
           await peer.setRemoteDescription(new RTCSessionDescription(offer));
+          remoteDescSet = true;
+
+          for (const c of iceQueue) {
+            await peer.addIceCandidate(new RTCIceCandidate(c));
+          }
+          iceQueue.length = 0;
 
           const answer = await peer.createAnswer();
           await peer.setLocalDescription(answer);
-
           await connection.invoke('ExchangeAnswerAsync', token, JSON.stringify(answer));
         });
 
         connection.on('ReceiveIceCandidate', async (candidateJson: string) => {
-          const candidate = new RTCIceCandidate(JSON.parse(candidateJson));
-          await peer.addIceCandidate(candidate);
+          const candidate = JSON.parse(candidateJson);
+          if (remoteDescSet) {
+            await peer.addIceCandidate(new RTCIceCandidate(candidate));
+          } else {
+            iceQueue.push(candidate);
+          }
         });
 
         await connection.start();
@@ -106,61 +114,6 @@ export default function useDestinationConnection(token: string | null) {
 
     const attemptReconnect = async () => {
       console.warn('Tentando reconectar...');
-
-      try {
-        if (connection?.state !== signalR.HubConnectionState.Connected) {
-          await connection.start();
-          await connection.invoke('JoinPairingSessionAsync', token, 1);
-        }
-
-        peer = new RTCPeerConnection({
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            {
-              urls: 'turn:openrelay.metered.ca:80',
-              username: 'openrelayproject',
-              credential: 'openrelayproject'
-            }
-          ]
-        });
-
-        connection.on('ReceiverReady', async () => {
-          const channel = peer.createDataChannel('data');
-          setDataChannel(channel);
-
-          channel.onopen = () => setConnected(true);
-          channel.onclose = () => setConnected(false);
-          channel.onerror = () => setConnected(false);
-
-          const offer = await peer.createOffer();
-          await peer.setLocalDescription(offer);
-          await connection.invoke('ExchangeOfferAsync', token, JSON.stringify(offer));
-        });
-
-        peer.onicecandidate = (event) => {
-          if (event.candidate) {
-            connection.invoke('ExchangeIceCandidateAsync', token, JSON.stringify(event.candidate));
-          }
-        };
-
-        peer.onconnectionstatechange = () => {
-          const state = peer.connectionState;
-          if (state === 'disconnected' || state === 'failed' || state === 'closed') {
-            setConnected(false);
-          }
-        };
-
-        connection.on('ReceiveIceCandidate', async (candidateJson: string) => {
-          await peer.addIceCandidate(new RTCIceCandidate(JSON.parse(candidateJson)));
-        });
-
-        connection.on('ReceiveAnswer', async (answerJson: string) => {
-          await peer.setRemoteDescription(new RTCSessionDescription(JSON.parse(answerJson)));
-        });
-
-      } catch (err) {
-        console.error('Falha ao tentar reconectar:', err);
-      }
     };
 
     setupConnection();
