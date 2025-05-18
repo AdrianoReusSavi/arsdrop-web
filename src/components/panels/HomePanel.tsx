@@ -34,6 +34,7 @@ const styles = {
         flexGrow: 1,
         padding: '2rem',
         position: 'relative' as const,
+        overflow: 'hidden',
     },
     waterDropContainer: {
         position: 'absolute' as const,
