@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Space, QRCodeProps, Spin, Drawer } from "antd";
+import { Button, Space, QRCodeProps, Spin, Drawer, message } from "antd";
 import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons';
 import CustomQrCode from "../ui/CustomQrCode";
 import useQrCode from "../../hooks/qr-code/useQrCode";
@@ -58,6 +58,7 @@ const ConnectionPanel: React.FC<ConnectionPanelProps> = ({ isMobile, scanned }) 
     const status = getStatus(loading, scanned, error!);
     const statusRender = getStatusRender();
     const { dataChannel, isOrigin } = useConnection();
+    const [messageApi, contextHolder] = message.useMessage();
 
     const [drawerType, setDrawerType] = useState<null | 'send' | 'receive' | 'share'>(null);
     const [title, setTitle] = useState('');
@@ -77,7 +78,7 @@ const ConnectionPanel: React.FC<ConnectionPanelProps> = ({ isMobile, scanned }) 
         setDrawerType('receive');
         setTitle('Receber arquivos');
     };
-    
+
     const handleOpenShare = () => {
         if (isOrigin && dataChannel && dataChannel.readyState === 'open') {
             dataChannel.send('open:share');
@@ -92,6 +93,25 @@ const ConnectionPanel: React.FC<ConnectionPanelProps> = ({ isMobile, scanned }) 
         }
         setDrawerType(null);
         setTitle('');
+    };
+
+    const copy = async () => {
+        try {
+            if (navigator.clipboard) {
+                await navigator.clipboard.writeText(qrCodeUrl || '');
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = qrCodeUrl || '';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            }
+            messageApi.open({
+                type: 'success',
+                content: 'Conexão copiada com sucesso!',
+            });
+        } catch { }
     };
 
     useEffect(() => {
@@ -124,32 +144,40 @@ const ConnectionPanel: React.FC<ConnectionPanelProps> = ({ isMobile, scanned }) 
 
     return (
         <div>
+            {contextHolder}
             {isOrigin && (
                 <div>
-                    <CustomQrCode
-                        size={isMobile ? 250 : 350}
-                        value={status === 'loading' || qrCodeUrl === null ? 'loading' : qrCodeUrl}
-                        status={status}
-                        statusRender={statusRender}
-                    />
-                    <Space direction="vertical" style={{ marginTop: 24 }}>
+                    <Space direction="vertical" align='center' style={{ marginTop: 24 }}>
+                        <Button
+                            disabled={scanned}
+                            style={{ width: isMobile ? 230 : 350 }}
+                            onClick={copy}
+                        >
+                            Compartilhar conexão
+                        </Button>
+                        <CustomQrCode
+                            size={isMobile ? 230 : 350}
+                            value={status === 'loading' || qrCodeUrl === null ? 'loading' : qrCodeUrl}
+                            status={status}
+                            statusRender={statusRender}
+                        />
                         <Button
                             disabled={!scanned}
-                            style={{ width: isMobile ? 250 : 350 }}
+                            style={{ width: isMobile ? 230 : 350 }}
                             onClick={handleOpenSend}
                         >
                             Enviar arquivos
                         </Button>
                         <Button
                             disabled={!scanned}
-                            style={{ width: isMobile ? 250 : 350 }}
+                            style={{ width: isMobile ? 230 : 350 }}
                             onClick={handleOpenReceive}
                         >
                             Receber arquivos
                         </Button>
                         <Button
                             disabled={!scanned}
-                            style={{ width: isMobile ? 250 : 350 }}
+                            style={{ width: isMobile ? 230 : 350 }}
                             onClick={handleOpenShare}
                         >
                             Compartilhar texto
