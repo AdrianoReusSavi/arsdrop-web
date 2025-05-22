@@ -7,6 +7,10 @@ export default function useOriginConnection(token: string | null) {
   const [dataChannel, setDataChannel] = useState<RTCDataChannel | null>(null);
 
   const signalrUrl = import.meta.env.VITE_SIGNALR_URL;
+  const turn_udp = import.meta.env.VITE_TURN_UDP;
+  const turn_tcp = import.meta.env.VITE_TURN_TCP;
+  const username = import.meta.env.VITE_TURN_USERNAME;
+  const credential = import.meta.env.VITE_TURN_CREDENTIAL;
 
   useEffect(() => {
     if (!token) return;
@@ -35,13 +39,9 @@ export default function useOriginConnection(token: string | null) {
           iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
             {
-              urls: [
-                'turn:openrelay.metered.ca:80',
-                'turn:openrelay.metered.ca:443',
-                'turn:openrelay.metered.ca:443?transport=tcp'
-              ],
-              username: 'openrelayproject',
-              credential: 'openrelayproject'
+              urls: [turn_udp, turn_tcp],
+              username: username,
+              credential: credential
             }
           ]
         });
