@@ -1,14 +1,16 @@
 import React from 'react';
 import { Layout } from 'antd';
+import SupportButton from '../ui/SupportButton';
 
 const { Content } = Layout;
 
 interface PageLayoutProps {
     children: React.ReactNode;
     darkMode: boolean;
+    isMobile: boolean;
 }
 
-const PageLayout: React.FC<PageLayoutProps> = ({ children, darkMode }) => {
+const PageLayout: React.FC<PageLayoutProps> = ({ children, darkMode, isMobile }) => {
     const textColor = darkMode ? '#f0f0f0' : '#000000';
 
     return (
@@ -23,6 +25,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children, darkMode }) => {
             <Content style={{ height: '100vh' }}>
                 {children}
             </Content>
+            <SupportButton isMobile={isMobile} />
         </Layout>
     );
 };

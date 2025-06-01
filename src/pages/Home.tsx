@@ -15,7 +15,7 @@ export default function Home() {
     const { ready, connected } = useConnection();
 
     if (!ready) {
-        <PageLayout darkMode={darkMode}>
+        <PageLayout darkMode={darkMode} isMobile={isMobile}>
             <PanelContainer isMobile={isMobile} borderColor={borderColor}>
                 <Skeleton active />
                 <Skeleton.Image active />
@@ -24,7 +24,7 @@ export default function Home() {
     }
 
     return (
-        <PageLayout darkMode={darkMode}>
+        <PageLayout darkMode={darkMode} isMobile={isMobile}>
             <PanelContainer isMobile={isMobile} borderColor={borderColor}>
                 <HomePanel
                     darkMode={darkMode}
